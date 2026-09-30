@@ -2,69 +2,69 @@ import { useEffect, useRef, useState } from 'react';
 import Encabezado from './components/Encabezado.jsx';
 import Galeria from './components/Galeria.jsx';
 import PWABadge from './PWABadge.jsx';
-import { CANTIDAD, cargarFotos, contarFotos, filtrarPorCategoria } from './biblioteca.js';
+import { CANTIDAD, cargarFotos, filtrarPorCategoria, filtrarPorTexto } from './biblioteca.js';
 import './App.css';
-
-const CATEGORIAS = ['todas', 'Ingresos', 'Estantes', 'Salon de lectura', 'Hemeroteca', 'Servicios'];
 
 function App() {
   const [fotos, setFotos] = useState([]);
   const [categoria, setCategoria] = useState('todas');
+  const [texto, setTexto] = useState('');
   const [cargando, setCargando] = useState(true);
-  const [restante, setRestante] = useState(3);
+  const [segundos, setSegundos] = useState(3);
   const [error, setError] = useState('');
-  const intervaloRef = useRef(null);
+  const relojRef = useRef(null);
 
   useEffect(() => {
-    let cancelado = false;
-
-    const cargar = async () => {
+    async function cargar() {
       try {
-        const resultado = await cargarFotos(CANTIDAD);
-        if (cancelado) return;
-        setFotos(resultado);
-      } catch (error) {
-        if (!cancelado) setError(error.message);
-      } finally {
-        if (!cancelado) setCargando(false);
+        setFotos(await cargarFotos(CANTIDAD));
+      } catch (err) {
+        setError(err.message);
       }
-    };
+      setCargando(false);
+    }
 
-    intervaloRef.current = setInterval(() => {
-      setRestante((actual) => (actual > 0 ? actual - 1 : 0));
+    relojRef.current = setInterval(() => {
+      setSegundos((s) => (s > 0 ? s - 1 : 0));
     }, 1000);
 
     cargar();
 
-    return () => {
-      cancelado = true;
-      clearInterval(intervaloRef.current);
-    };
+    return () => clearInterval(relojRef.current);
   }, []);
 
-  const visibles = filtrarPorCategoria(fotos, categoria);
+  function handleCambiarCategoria(valor) {
+    setCategoria(valor);
+  }
+
+  function handleBuscar(valor) {
+    setTexto(valor);
+  }
+
+  const visibles = filtrarPorTexto(filtrarPorCategoria(fotos, categoria), texto);
 
   return (
     <div>
-      <Encabezado total={contarFotos(visibles)} cargando={cargando} restante={restante} />
+      <Encabezado total={visibles.length} cargando={cargando} segundos={segundos} />
 
       <main className="container mb-5">
-        {error !== '' && <p className="alert alert-danger">Error: {error}</p>}
+        {error !== '' && <div className="alert alert-danger">Error: {error}</div>}
 
         {cargando ? (
-          <p className="text-muted">La galeria aparecera en 3 segundos.</p>
+          <p className="text-muted">regresamos en 3 segundos wait</p>
         ) : (
           <Galeria
             fotos={visibles}
-            categorias={CATEGORIAS}
             categoria={categoria}
-            onCambiarCategoria={setCategoria}
+            texto={texto}
+            onCambiarCategoria={handleCambiarCategoria}
+            onBuscar={handleBuscar}
           />
         )}
       </main>
 
-      <footer className="bg-dark text-green text-center py-3">
-        <p className="small mb-0">pagina fea pero funcional &middot; IDGS1003</p>
+      <footer className="bg-dark text-white text-center py-3">
+        <p className="small mb-0">jluzz-biblio-awp &middot; IDGS1003</p>
       </footer>
 
       <PWABadge />

@@ -1,37 +1,50 @@
-import datosBase from './biblioteca.json';
+import base from './biblioteca.json';
 
-export const API_FOTOS = 'https://picsum.photos/v2/list?page=1';
-export const TIEMPO_ESPERA = 3000;
-export const CANTIDAD = 1;
+export const URL_FOTOS = 'https://picsum.photos/v2/list?page=1';
+export const CANTIDAD = 4;
+export const TIEMPO_CARGA = 3000;
 
-export const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export const CATEGORIAS = [
+  'todas',
+  'libros ',
+  'descanso',
+  'salones',
+  'centro de computo',
+  'recepcion'
+];
 
-export const crearFoto = (titulo, categoria, autor, imagen) => ({
-  id: Date.now() + Math.random(),
-  titulo,
-  categoria,
-  autor,
-  imagen
-});
+export function esperar(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-export const filtrarPorCategoria = (fotos, categoria) => {
+export function crearFoto(titulo, categoria, imagen) {
+  return { titulo, categoria, imagen };
+}
+
+export function filtrarPorCategoria(fotos, categoria) {
   if (categoria === 'todas') return fotos;
-  return fotos.filter((foto) => foto.categoria === categoria);
-};
+  return fotos.filter((f) => f.categoria === categoria);
+}
 
-export const contarFotos = (fotos) => fotos.length;
+export function filtrarPorTexto(fotos, texto) {
+  if (texto === '') return fotos;
+  return fotos.filter((f) => f.titulo.toLowerCase().includes(texto.toLowerCase()));
+}
 
-export const cargarFotos = async (cantidad) => {
-  await esperar(TIEMPO_ESPERA);
+export async function cargarFotos(cantidad) {
+  await esperar(TIEMPO_CARGA);
 
-  const respuesta = await fetch(`${API_FOTOS}&limit=${cantidad}`);
-  if (!respuesta.ok) throw new Error('El API no respondio correctamente');
+  const res = await fetch(`${URL_FOTOS}&limit=${cantidad}`);
+  if (!res.ok) throw new Error('No se pudo conectar con el API');
 
-  const lista = await respuesta.json();
+  const lista = await res.json();
 
   return lista.map((item, i) => {
-    const base = datosBase[i % datosBase.length];
-    const imagen = `https://picsum.photos/id/${item.id}/400/300`;
-    return crearFoto(base.titulo, base.categoria, item.author, imagen);
+    const info = base[i % base.length];
+    return crearFoto(
+      info.titulo,
+      info.categoria,
+      `https://picsum.photos/id/${item.id}/400/300`
+    );
   });
-};
+}

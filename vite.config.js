@@ -14,10 +14,11 @@ export default defineConfig({
     },
 
     manifest: {
-      name: 'jluzz-biblio-awp',
+      name: 'Galería de la Biblioteca UTL',
       short_name: 'jluzz-biblio-awp',
-      description: 'examen1',
-      theme_color: '#ffffff',
+      description: 'Galería de fotografías de la biblioteca de la UTL',
+      lang: 'es',
+      theme_color: '#212529',
     },
 
     workbox: {
