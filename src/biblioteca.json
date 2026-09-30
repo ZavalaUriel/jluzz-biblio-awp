@@ -1,0 +1,25 @@
+[
+  {
+    "titulo": "principal",
+    "categoria": "libros",
+    "descripcion": "labiblioteca",
+    "autor": "Uriel"
+  },
+
+  {
+    "titulo": "La leyenda de la llorona",
+    "categoria": "salones",
+    "descripcion": "Pues es un libro que es sobre la leyenda de la llorona"
+  }, 
+  {
+    "titulo": "Scooby doo",
+    "categria": "descanso",
+    "descripcion": "no se me ocurrio que mas poner JAJAJJA"
+  },
+  {
+    "titulo": "ojala me pusieran 8",
+    "categoria": "descanso",
+    "descripcion": "pues si verdad"
+
+  }
+]
